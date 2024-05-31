@@ -44,9 +44,18 @@ const Form = () => {
   const [nama, setNama] = useState("");
   const [quantity, setQuantity] = useState(1);
 
+  
   function handleSubmit(e) {
     e.preventDefault();
-    alert(`Halo, aku ${nama} dan beli ${quantity}`);
+    
+    if(!nama) return;
+    
+    const newItem = { nama, quantity, checked: false, id: Date.now() };
+
+    console.log(newItem);
+
+    setNama("")
+    setQuantity(1)
   }
 
   const quantityNum = [...Array(10)].map((_, i) => (
@@ -59,8 +68,16 @@ const Form = () => {
     <form className="add-form" onSubmit={handleSubmit}>
       <h3>Hari ini belanja apa kita?</h3>
       <div>
-        <select value={quantity} onChange={(e) => setQuantity(e.target.value)}>{quantityNum}</select>
-        <input type="text" placeholder="nama barang..." value={nama} onChange={(e) => setNama(e.target.value)}/>
+        <select value={quantity} onChange={(e) => setQuantity(Number(e.target.value))}>
+          {quantityNum}
+        </select>
+        <input
+          type="text"
+          placeholder="nama barang..."
+          value={nama}
+          required
+          onChange={(e) => setNama(e.target.value)}
+        />
       </div>
       <button>Tambah</button>
     </form>
