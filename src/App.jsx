@@ -5,13 +5,13 @@ const groceryItems = [
     id: 1,
     name: "Kopi Bubuk",
     quantity: 2,
-    checked: false, 
+    checked: false,
   },
   {
     id: 2,
     name: "Gula Pasir",
     quantity: 5,
-    checked: false, 
+    checked: false,
   },
   {
     id: 3,
@@ -33,7 +33,15 @@ const App = () => {
   }
 
   function handletoggleItem(id) {
-    setItems((items) => items.map((item) => (item.id === id ? {...item, checked: !item.checked} : item )));
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, checked: !item.checked } : item
+      )
+    );
+  }
+
+  function handleClear() {
+    setItems([]);
   }
 
   console.log(items);
@@ -42,9 +50,14 @@ const App = () => {
     <>
       <div className="app">
         <Header />
-        <Form OnAddItem={handleAddItem}/>
-        <GroceryList items={items} onDeleteItem={handleDeleteItem} onToggleItem={handletoggleItem}/>
-        <Footer />
+        <Form OnAddItem={handleAddItem} />
+        <GroceryList
+          items={items}
+          onDeleteItem={handleDeleteItem}
+          onToggleItem={handletoggleItem}
+          onClearItem={handleClear}
+        />
+        <Footer items={items} />
       </div>
     </>
   );
@@ -65,7 +78,7 @@ const Form = ({ OnAddItem }) => {
 
     if (!name) return;
 
-    const newItem = {id: Date.now(), name, quantity, checked: false };
+    const newItem = { id: Date.now(), name, quantity, checked: false };
 
     OnAddItem(newItem);
 
@@ -102,23 +115,44 @@ const Form = ({ OnAddItem }) => {
   );
 };
 
-const GroceryList = ({ items, onDeleteItem, onToggleItem }) => {
+const GroceryList = ({ items, onDeleteItem, onToggleItem, onClearItem }) => {
+  const [sortBy, setSortBy] = useState("input");
+
+  let sortedItems;
+
+  switch (sortBy) {
+    case "name":
+      sortedItems = items.slice().sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "checked":
+      sortedItems = items.slice().sort((a, b) => a.checked - b.checked);
+      break;
+    default:
+      sortedItems = items;
+      break;
+  }
+
   return (
     <>
       <div className="list">
         <ul>
-          {items.map((item) => (
-            <Item item={item} key={item.id} onDeleteItem={onDeleteItem} onToggleItem={onToggleItem}/>
+          {sortedItems.map((item) => (
+            <Item
+              item={item}
+              key={item.id}
+              onDeleteItem={onDeleteItem}
+              onToggleItem={onToggleItem}
+            />
           ))}
         </ul>
       </div>
       <div className="actions">
-        <select>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="input">Urutkan berdasarkan urutan input</option>
           <option value="name">Urutkan berdasarkan nama barang</option>
           <option value="checked">Urutkan berdasarkan ceklis</option>
         </select>
-        <button>Bersihkan Daftar</button>
+        <button onClick={onClearItem}>Bersihkan Daftar</button>
       </div>
     </>
   );
@@ -127,7 +161,7 @@ const GroceryList = ({ items, onDeleteItem, onToggleItem }) => {
 const Item = ({ item, onDeleteItem, onToggleItem }) => {
   return (
     <li key={item.id}>
-      <input type="checkbox" onClick={() => onToggleItem(item.id)}/>
+      <input type="checkbox" onClick={() => onToggleItem(item.id)} />
       <span style={item.checked ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.name}
       </span>
@@ -136,11 +170,16 @@ const Item = ({ item, onDeleteItem, onToggleItem }) => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ items }) => {
+  const totalItems = items.length;
+  const checkedItems = items.filter((item) => item.checked).length;
+  const percentage = Math.round((checkedItems / totalItems) * 100);
+
   return (
     <footer className="stats">
       {" "}
-      Ada 10 barang di daftar belanjaan, 5 barang sudah dibeli (50%){" "}
+      Ada {totalItems} barang di daftar belanjaan, {checkedItems} barang sudah
+        dibeli ({checkedItems ? percentage : 0} %){" "}
     </footer>
   );
 };
