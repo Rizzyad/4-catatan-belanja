@@ -5,13 +5,13 @@ const groceryItems = [
     id: 1,
     name: "Kopi Bubuk",
     quantity: 2,
-    checked: true,
+    checked: false, 
   },
   {
     id: 2,
     name: "Gula Pasir",
     quantity: 5,
-    checked: true,
+    checked: false, 
   },
   {
     id: 3,
@@ -32,6 +32,10 @@ const App = () => {
     setItems((items) => items.filter((item) => item.id !== id));
   }
 
+  function handletoggleItem(id) {
+    setItems((items) => items.map((item) => (item.id === id ? {...item, checked: !item.checked} : item )));
+  }
+
   console.log(items);
 
   return (
@@ -39,7 +43,7 @@ const App = () => {
       <div className="app">
         <Header />
         <Form OnAddItem={handleAddItem}/>
-        <GroceryList items={items} onDeleteItem={handleDeleteItem} />
+        <GroceryList items={items} onDeleteItem={handleDeleteItem} onToggleItem={handletoggleItem}/>
         <Footer />
       </div>
     </>
@@ -98,13 +102,13 @@ const Form = ({ OnAddItem }) => {
   );
 };
 
-const GroceryList = ({ items, onDeleteItem }) => {
+const GroceryList = ({ items, onDeleteItem, onToggleItem }) => {
   return (
     <>
       <div className="list">
         <ul>
           {items.map((item) => (
-            <Item item={item} key={item.id} onDeleteItem={onDeleteItem}/>
+            <Item item={item} key={item.id} onDeleteItem={onDeleteItem} onToggleItem={onToggleItem}/>
           ))}
         </ul>
       </div>
@@ -120,10 +124,10 @@ const GroceryList = ({ items, onDeleteItem }) => {
   );
 };
 
-const Item = ({ item, onDeleteItem }) => {
+const Item = ({ item, onDeleteItem, onToggleItem }) => {
   return (
     <li key={item.id}>
-      <input type="checkbox" />
+      <input type="checkbox" onClick={() => onToggleItem(item.id)}/>
       <span style={item.checked ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.name}
       </span>
