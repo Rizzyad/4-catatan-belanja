@@ -25,6 +25,8 @@ const App = () => {
   const [items, setItems] = useState(groceryItems);
 
   function handleAddItem(item) {
+    if(item === " ") return;
+    
     setItems([...items, item]);
   }
 
@@ -76,7 +78,7 @@ const Form = ({ OnAddItem }) => {
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!name) return;
+    if (!name.trim()) return; 
 
     const newItem = { id: Date.now(), name, quantity, checked: false };
 
