@@ -22,12 +22,20 @@ const groceryItems = [
 ];
 
 const App = () => {
+  const [items, setItems] = useState(groceryItems);
+
+  function handleAdditem(item) {
+    setItems([...items, item]);
+  }
+
+  console.log(items);
+
   return (
     <>
       <div className="app">
         <Header />
-        <Form />
-        <GroceryList />
+        <Form OnAddItem={handleAdditem} />
+        <GroceryList items={items} />
         <Footer />
       </div>
     </>
@@ -40,22 +48,21 @@ const Header = () => {
   return <h1>Catatan Belanjaku 📝</h1>;
 };
 
-const Form = () => {
-  const [nama, setNama] = useState("");
+const Form = ({ OnAddItem }) => {
+  const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(1);
 
-  
   function handleSubmit(e) {
     e.preventDefault();
-    
-    if(!nama) return;
-    
-    const newItem = { nama, quantity, checked: false, id: Date.now() };
 
-    console.log(newItem);
+    if (!name) return;
 
-    setNama("")
-    setQuantity(1)
+    const newItem = {id: Date.now(), name, quantity, checked: false };
+
+    OnAddItem(newItem);
+
+    setName("");
+    setQuantity(1);
   }
 
   const quantityNum = [...Array(10)].map((_, i) => (
@@ -68,15 +75,18 @@ const Form = () => {
     <form className="add-form" onSubmit={handleSubmit}>
       <h3>Hari ini belanja apa kita?</h3>
       <div>
-        <select value={quantity} onChange={(e) => setQuantity(Number(e.target.value))}>
+        <select
+          value={quantity}
+          onChange={(e) => setQuantity(Number(e.target.value))}
+        >
           {quantityNum}
         </select>
         <input
           type="text"
           placeholder="nama barang..."
-          value={nama}
+          value={name}
           required
-          onChange={(e) => setNama(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
       </div>
       <button>Tambah</button>
@@ -84,13 +94,13 @@ const Form = () => {
   );
 };
 
-const GroceryList = () => {
+const GroceryList = ({ items }) => {
   return (
     <>
       <div className="list">
         <ul>
-          {groceryItems.map((item) => (
-            <Item item={item} key={item.id}/>
+          {items.map((item) => (
+            <Item item={item} key={item.id} />
           ))}
         </ul>
       </div>
